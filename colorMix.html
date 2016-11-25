@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+
+var width = 500,
+    height = 500;
+var opVal = 1/2;
+var loop = true;
+//Set up SVG and x1is//   
+var svg = d3.select("body").append("svg")
+    .style("background-color", "#ffffff")
+    .attr("width", width)
+    .attr("height", height);
+
+svg.append("circle")
+    .attr("cx", 250)
+    .attr("cy", 500 / 3 )
+    .attr("r", 500 / 4)
+    .attr("fill", "red")
+    .attr("opacity",opVal);
+
+svg.append("circle")
+    .attr("cx", 500 / 3)
+    .attr("cy", 300 )
+    .attr("r", 500 / 4)
+    .attr("fill", "green")
+    .attr("opacity",opVal);
+
+svg.append("circle")
+    .attr("cx", 1000 / 3)
+    .attr("cy", 300)
+    .attr("r", 500 / 4)
+    .attr("fill", "blue")
+    .attr("opacity",opVal);
+    
+    
+
+</script>
