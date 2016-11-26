@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+<style>
+body {
+      font-family: Verdana,Arial,sans-serif;
+    }
+
+    .wrapper {
+      width: 500px;
+      margin-left: 10px;
+      margin-right: auto;
+    }
+	
+	.trHeight {
+		height: 25px;
+	}
+
+
+.d3-slider {
+    position: relative;
+    font-family: Verdana,Arial,sans-serif;
+    font-size: 1.1em;
+    border: 1px solid #aaaaaa;
+    z-index: 2;
+}
+
+.d3-slider-horizontal {
+    height: .8em;
+}  
+
+.d3-slider-range {
+  background:#2980b9;
+  left:0px;
+  right:0px;
+  height: 0.8em;
+  position: absolute;
+}
+
+.d3-slider-range-vertical {
+  background:#2980b9;
+  left:0px;
+  right:0px;
+  position: absolute;
+  top:0;
+}
+
+.d3-slider-vertical {
+    width: .8em;
+    height: 100px;
+}      
+
+.d3-slider-handle {
+    position: absolute;
+    width: 1.2em;
+    height: 1.2em;
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    background: #eee;
+    background: linear-gradient(to bottom, #eee 0%, #ddd 100%);
+    z-index: 3;
+}
+
+.d3-slider-handle:hover {
+    border: 1px solid #999999;
+}
+
+.d3-slider-horizontal .d3-slider-handle {
+    top: -.3em;
+    margin-left: -.6em;
+}
+
+.d3-slider-axis {
+    position: relative;
+    z-index: 1;    
+}
+
+.d3-slider-axis-bottom {
+    top: .8em;
+}
+
+.d3-slider-axis-right {
+    left: .8em;
+}
+
+.d3-slider-axis path {
+    stroke-width: 0;
+    fill: none;
+}
+
+.d3-slider-axis line {
+    fill: none;
+    stroke: #aaa;
+    shape-rendering: crispEdges;
+}
+
+.d3-slider-axis text {
+    font-size: 11px;
+}
+
+.d3-slider-vertical .d3-slider-handle {
+    left: -.25em;
+    margin-left: 0;
+    margin-bottom: -.6em;      
+}
+</style>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="https://raw.githubusercontent.com/turban/d3.slider/master/d3.slider.js"></script>
+
+<script>
+function docloader(){
+	var width = 500,    height = 200;
+	var filter;
+	var k1 = 1, k2 = 1, k3 = 1, k4 = 0, circleColor = "orange", SpecularLightingColor  = "#bbbbbb";
+	reloadSVG();
+	function reloadSVG(){
+	d3.select("#svgHolder").select("svg").remove();
+	var svg = d3.select("#svgHolder").append("svg")
+		.attr("width", width)
+		.attr("height", height);
+		//.style("background-color", "#EFEFEF");
+		
+	var defs = svg.append("defs");
+	
+	filter = defs.append("filter")
+		.attr("id", "MyFilter")
+		.attr("filterUnits","userSpaceOnUse")
+		.attr("x",0)
+		.attr("y",0)
+		.attr("width",width)
+		.attr("height",height);
+	filter.append("feGaussianBlur")
+		.attr("in", "SourceAlpha")
+		.attr("stdDeviation", 4)
+		.attr("result", "blur");
+	filter.append("feOffset")
+		.attr("in", "blur")
+		.attr("dx", 2)
+		.attr("dy", 2)
+		.attr("result", "offsetBlur");
+	filter.append("feSpecularLighting")
+		.attr("in", "blur")
+		.attr("surfaceScale", 5)
+		.attr("specularConstant", .95)
+		.attr("specularExponent", 20)
+	    .attr("lighting-color", SpecularLightingColor)
+		.attr("result","specOut")
+		.append("fePointLight")
+			.attr("x", -5000)
+			.attr("y", -10000)
+			.attr("z", 20000);
+	filter.append("feComposite")
+		.attr("in","specOut")
+		.attr("in2", "SourceAlpha")
+		.attr("operator", "in")
+		.attr("result", "specOut");
+	filter.append("feComposite")
+		.attr("in","SourceGraphic")
+		.attr("in2","specOut")
+		.attr("operator","arithmetic")
+		.attr("k1",k1)
+		.attr("k2",k2)
+		.attr("k3",k3)
+		.attr("k4",k4)
+		.attr("result","litPaint");
+	  
+	var feMerge = filter.append("feMerge")
+		.attr("id", "feMerge");
+	feMerge.append("feMergeNode")
+	  .attr("in", "offsetBlur")
+	feMerge.append("feMergeNode")
+	  .attr("in", "litPaint");
+
+	svg.append("circle")
+    .attr("cx", width / 2)
+	.attr("cy", height / 2)
+	.attr("r", 40)
+	.style("fill",circleColor)
+	.attr("filter", "url(#MyFilter)");
+	}
+	
+	function FObjectcolor(v, e)
+	{
+		var factor = v.value; //object-color
+		circleColor = factor;
+		d3.select("circle").style("fill",factor);
+	}
+	
+	function FfeSpecularLightingcolor(v, e)
+	{
+		var factor = v.value; //lighting-color
+		SpecularLightingcolor = factor;
+		filter.select("feSpecularLighting").attr("lighting-color",factor);
+	}
+	
+	d3.select('#FWidth').call(d3.slider().on("slide", function(evt, value) { 
+		var factor = value * width / 100;
+		d3.select('#FWidthTxt').attr("value",factor);
+		filter.attr("width",factor);
+	}));
+	
+	d3.select('#FHeight').call(d3.slider().on("slide", function(evt, value) {
+		var factor = value  * height / 100;
+		d3.select('#FHeightTxt').attr("value",factor);
+		filter.attr("height",factor);
+    }));
+	
+	d3.select('#FfeGaussianBlurstdDeviation').call(d3.slider().on("slide", function(evt, value) {
+		var factor = value  * 20 / 100;
+		d3.select('#FGaussianBlurstdDeviationTxt').attr("value",factor);
+		filter.select("feGaussianBlur").attr("stdDeviation",factor);
+    }));
+	
+	d3.select('#FfeOffsetdx').call(d3.slider().on("slide", function(evt, value) {
+		var factor = value  * 400 / 100 - 200;
+		d3.select('#FfeOffsetdxTxt').attr("value",factor);
+		filter.select("feOffset").attr("dx",factor);
+    }));
+	
+	d3.select('#FfeOffsetdy').call(d3.slider().on("slide", function(evt, value) {
+		var factor = value  * 200 / 100 - 100;
+		d3.select('#FfeOffsetdyTxt').attr("value",factor);
+		filter.select("feOffset").attr("dy",factor);
+    }));
+	
+	d3.select('#FfeSpecularLightingsurfaceScale').call(d3.slider().on("slide", function(evt, value) {
+		var factor = value  * 50 / 100;
+		d3.select('#FfeSpecularLightingsurfaceScaleTxt').attr("value",factor);
+		filter.select("feSpecularLighting").attr("surfaceScale",factor);
+    }));
+	
+	d3.select('#FfeSpecularLightingspecularConstant').call(d3.slider().on("slide", function(evt, value) {
+		var factor = value  * 4 / 100;
+		d3.select('#FfeSpecularLightingspecularConstantTxt').attr("value",factor);
+		filter.select("feSpecularLighting").attr("specularConstant",factor);
+    }));
+	
+	d3.select('#FfeSpecularLightingspecularExponent').call(d3.slider().on("slide", function(evt, value) {
+		var factor = value  * 50 / 100;
+		d3.select('#FfeSpecularLightingspecularExponentTxt').attr("value",factor);
+		filter.select("feSpecularLighting").attr("specularExponent",factor);
+    }));
+	
+	d3.select('#FfePointLightX').call(d3.slider().on("slide", function(evt, value) {
+		var factor = value  * 100000 / 100 - 50000;
+		d3.select('#FfePointLightXTxt').attr("value",factor);
+		filter.select("feSpecularLighting").select("fePointLight").attr("x",factor);
+    }));
+	
+	d3.select('#FfePointLightY').call(d3.slider().on("slide", function(evt, value) {
+		var factor = value  * 100000 / 100 - 50000;
+		d3.select('#FfePointLightYTxt').attr("value",factor);
+		filter.select("feSpecularLighting").select("fePointLight").attr("y",factor);
+    }));
+	
+	d3.select('#FfePointLightZ').call(d3.slider().on("slide", function(evt, value) {
+		var factor = value  * 75000 / 100;
+		d3.select('#FfePointLightZTxt').attr("value",factor);
+		filter.select("feSpecularLighting").select("fePointLight").attr("z",factor);
+    }));
+	
+	d3.select('#FfeCompositek1').call(d3.slider().on("slide", function(evt, value) {
+		var factor = value  * 50 / 100;
+		d3.select('#FfeCompositek1Txt').attr("value",factor);
+		k1 = factor;
+		reloadSVG();
+    }));
+	
+	d3.select('#FfeCompositek2').call(d3.slider().on("slide", function(evt, value) {
+		var factor = value  * 10 / 100;
+		d3.select('#FfeCompositek2Txt').attr("value",factor);
+		k2 = factor;
+		reloadSVG();
+    }));
+	
+	d3.select('#FfeCompositek3').call(d3.slider().on("slide", function(evt, value) {
+		var factor = value  * 20 / 100;
+		d3.select('#FfeCompositek3Txt').attr("value",factor);
+		k3 = factor;
+		reloadSVG();
+    }));
+	
+	d3.select('#FfeCompositek4').call(d3.slider().on("slide", function(evt, value) {
+		var factor = value  * 1 / 100;
+		d3.select('#FfeCompositek4Txt').attr("value",factor);
+		k4 = factor;
+		reloadSVG();
+    }));
+	
+	// color all sliders
+	d3.selectAll(".d3-slider")
+		.style("background-color", "#f1f1f1")
+		.style("height","10px");
+		
+}
+</script>
+</head>
+<body onload="docloader()">
+ <div id="svgHolder"></div>
+ <div style="height: 400px; width: 550px; overflow: auto;" class="wrapper">
+	<table class="wrapper">
+		<tr >
+			<td  width= "400px"> Filter -> Object color: </td>
+			<td> <input type="text" id="FObjectcolorTxt" onkeyup="FObjectcolor(this, event)"/> </td>
+		</tr>
+		<tr><td colspan="2"><div id="FObjectcolor"></div> </td></tr>
+		<tr class = "trHeight"> </tr>
+		
+		<tr >
+			<td> Filter -> feSpecularLighting color: </td> 
+			<td> <input type="text" id="FfeSpecularLightingcolorTxt" onkeyup="FfeSpecularLightingcolor(this, event)"></input> </td>
+		</tr>
+		<tr><td colspan="2"><div id="FfeSpecularLightingcolor"></div> </td></tr>
+		<tr class = "trHeight">	</tr>
+		
+		<tr >
+			<td> Filter width: </td> 
+			<td > <input type="text" id="FWidthTxt" ></input> </td> </tr>
+		<tr><td colspan="2"><div id="FWidth"></div> </td></tr>
+		<tr class = "trHeight"> </tr>
+		
+		<tr >
+			<td> Filter height: </td> 
+			<td> <input type="text" id="FHeightTxt"></input> </td></tr>
+		<tr><td colspan="2"><div id="FHeight"></div> </td></tr>
+		<tr class = "trHeight">	</tr>
+		
+		<tr >
+			<td> Filter -> feGaussianBlur stdDeviation: </td> 
+			<td> <input type="text" id="FGaussianBlurstdDeviationTxt"></input> </td></tr>
+		<tr><td colspan="2"><div id="FfeGaussianBlurstdDeviation"></div> </td></tr>
+		<tr class = "trHeight">	</tr>
+		
+		<tr >
+			<td> Filter -> feOffset dx: </td> 
+			<td> <input type="text" id="FfeOffsetdxTxt"></input> </td></tr>
+		<tr><td colspan="2"><div id="FfeOffsetdx"></div> </td></tr>
+		<tr class = "trHeight">	</tr>
+		
+		<tr >
+			<td> Filter -> feOffset dy: </td> 
+			<td> <input type="text" id="FfeOffsetdyTxt"></input> </td></tr>
+		<tr><td colspan="2"><div id="FfeOffsetdy"></div> </td></tr>
+		<tr>					</tr>
+		
+		<tr >
+			<td> Filter -> feSpecularLighting surfaceScale: </td> 
+			<td> <input type="text" id="FfeSpecularLightingsurfaceScaleTxt"></input> </td></tr>
+		<tr><td colspan="2"><div id="FfeSpecularLightingsurfaceScale"></div>			 </td></tr>
+		<tr class = "trHeight">	</tr>
+		
+		<tr >
+			<td> Filter -> feSpecularLighting specularConstant: </td> 
+			<td> <input type="text" id="FfeSpecularLightingspecularConstantTxt"></input> </td></tr>
+		<tr><td colspan="2"><div id="FfeSpecularLightingspecularConstant"></div> </td></tr>
+		<tr class = "trHeight">	</tr>
+		
+		<tr >
+			<td> Filter -> feSpecularLighting specularExponent: </td> 
+			<td> <input type="text" id="FfeSpecularLightingspecularExponentTxt"></input> </td></tr>
+		<tr><td colspan="2"><div id="FfeSpecularLightingspecularExponent"></div>			 </td></tr>
+		<tr class = "trHeight">	</tr>
+		
+		<tr >
+			<td> Filter -> feSpecularLighting -> fePointLight x: </td> 
+			<td> <input type="text" id="FfePointLightXTxt"></input> </td></tr>
+		<tr><td colspan="2"><div id="FfePointLightX"></div></td></tr>
+		<tr class = "trHeight">	</tr>
+		
+		<tr >
+			<td> Filter -> feSpecularLighting -> fePointLight y: </td> 
+			<td> <input type="text" id="FfePointLightYTxt"></input> </td></tr>
+		<tr><td colspan="2"><div id="FfePointLightY"></div></td></tr>
+		<tr class = "trHeight">	</tr>
+		
+		<tr >
+			<td> Filter -> feSpecularLighting -> fePointLight z: </td> 
+			<td> <input type="text" id="FfePointLightZTxt"></input> </td></tr>
+		<tr><td colspan="2"><div id="FfePointLightZ"></div></td></tr>
+		<tr class = "trHeight">	</tr>
+		
+		<tr >
+			<td> Filter -> feComposite k1: </td> 
+			<td> <input type="text" id="FfeCompositek1Txt"></input> </td></tr>
+		<tr><td colspan="2"><div id="FfeCompositek1"></div></td></tr>
+		<tr class = "trHeight">	</tr>
+		
+		<tr >
+			<td> Filter -> feComposite k2: </td> 
+			<td> <input type="text" id="FfeCompositek2Txt"></input> </td></tr>
+		<tr><td colspan="2"><div id="FfeCompositek2"></div></td></tr>
+		<tr class = "trHeight">	</tr>
+		
+		<tr >
+			<td> Filter -> feComposite k3: </td> 
+			<td> <input type="text" id="FfeCompositek3Txt"></input> </td></tr>
+		<tr><td colspan="2"><div id="FfeCompositek3"></div></td></tr>
+		<tr class = "trHeight">	</tr>
+		
+		<tr >
+			<td> Filter -> feComposite k4: </td> 
+			<td> <input type="text" id="FfeCompositek4Txt"></input> </td></tr>
+		<tr><td colspan="2"><div id="FfeCompositek4"></div></td></tr>
+		<tr class = "trHeight">	</tr>
+		
+	</table>
+ </div>
+	
+</body>
+</body>

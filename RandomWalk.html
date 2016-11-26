@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+
+var height = 520,
+    width = 520;
+
+var svg = d3.select("body").append("svg")
+    .attr("height", height)
+    .attr("width", width)
+    .style("background-color", "black");
+
+var pt = svg.append("circle")
+    .attr("cx", width * Math.random())
+    .attr("cy", height * Math.random())
+    .attr("r", 5)
+    .attr("fill", "red");
+var ox, oy, nx, ny;
+randpt();
+
+function randpt() {
+    ox = +pt.attr("cx");
+    oy = +pt.attr("cy");
+    nx = width * Math.random();
+    ny = height * Math.random();
+    svg.append("line")
+        .transition()
+        .duration(800)
+        .ease("bounce")
+        .attr("x1", ox)
+        .attr("y1", oy)
+        .attr("x2", nx)
+        .attr("y2", ny)
+        .attr("stroke", "#EFEFEF")
+        .attr("stroke-width", 4);
+    
+    pt.transition()
+        .duration(800)
+        .ease("smooth")
+        .attr("cx", nx)
+        .attr("cy", ny)
+        .attr("fill", d3.rgb(255 * Math.random(), 255 * Math.random(), 255 * Math.random()));
+
+    setTimeout(function () {
+        randpt()
+    }, 800);
+}
+
+</script>

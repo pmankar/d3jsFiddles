@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<style>
+ .draggable {
+     cursor: move;
+ }
+</style>
+</head>
+<body>
+<svg id="svg" xmlns="http://www.w3.org/2000/svg" width="600px" height="600px">
+    <clipPath id="clipCircle">
+        <path d="M0 0L60 103.92304845413263 L120, 0 Z" />
+        
+        <!-- for circular 60 deg sector M0 0 L120 0 A120 120 0 0 1 60.000000000000014 103.92304845413263 z/>-->
+
+    </clipPath>
+</svg>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+var sqrt3 = Math.sqrt(3);
+var edge = 120;
+var height = sqrt3 * edge / 2;
+var d = "M0 0" + "L60 " + height + " L120, 0" + " Z";
+
+for (i = 0; i < 6; i++) {
+    d3.select("#svg").append("path")
+        .attr("d", d)
+        .attr("transform", "translate(200, 200) rotate(" + i * 60 + ")");
+}
+d3.select("body").append("span")
+    .text(d);
+
+var g = d3.select("#svg").append("g");
+
+for (i = 0; i < 6; i++) {
+    g.append("svg:image")
+        .attr("xlink:href", "http://secondsauctions.com/uploaded/61/url.png")
+        .attr("width", 200)
+        .attr("height", 200)
+        .attr("x", -70)
+        .attr("y", -100)
+        .attr("transform", " translate(200, 200) rotate(" + i * 60 + ", 00, 00)")
+        .attr("clip-path", "url(#clipCircle)")
+        .attr("class", "draggable")
+        .on("mousemove", selectElement);
+}
+
+function selectElement() {
+    var m = d3.mouse(this);
+    var x = m[0],
+        y = m[1];
+    d3.selectAll("image")
+        .attr("x", -x)
+        .attr("y", -y);
+}
+</script>
+</body>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<style>
+line, circle{
+    fill: none;
+    stroke: grey;
+    stroke-width: 2px;
+    opacity: 0.83
+}
+</style>
+</head>
+<body>
+
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+height = 700, width = 700;
+radius = 200;
+cx = width / 2, cy = height / 2;
+x1=cx, y1=cy;
+
+svg = d3.select("body").append("svg")
+    .attr("height", height)
+    .attr("width", width)
+    .on("mousemove", mousemove);
+svg.append("circle")
+    .attr("cx", cx)
+    .attr("cy", cy)
+    .attr("r", 200);
+svg.append("line")
+    .attr("x1", cx - radius * 1.1)
+    .attr("x2", cx + radius  *1.1)
+    .attr("y1", cy)
+    .attr("y2", cy);
+svg.append("line")
+    .attr("y1", cy - radius * 1.1)
+    .attr("y2", cy + radius  *1.1)
+    .attr("x1", cx)
+    .attr("x2", cx);
+
+svg.append("line")
+    .attr("id", "lcursor")
+    .attr("x1", cx)
+    .attr("y1", cy)
+    .attr("x2", cx)
+    .attr("y2", cy);
+
+svg.append("circle")
+    .attr("id", "tgt")
+    .attr("r", 2)
+    .style("fill","red")
+    .attr("cx", 300)
+    .attr("cy", 300);
+
+svg.append("line").attr("id", "v");
+svg.append("line").attr("id", "h");
+
+function mousemove(){
+    m = d3.mouse(this); 
+    theta = Math.atan((m[1] -(cy) ) /  (m[0] -( cx)));
+    if (m[0] < cx) theta = Math.PI  + theta;
+    x1 = Math.cos(theta) * radius;
+    y1 = Math.sin(theta) * radius;   
+    //console.log(m[0] + " < " + m[1]);
+    d3.select("#tgt")
+        .attr("cx", x1 + cx)
+        .attr("cy", y1 + cy);
+    
+    d3.select("#lcursor")
+        .attr("x2", x1 + cx)
+        .attr("y2", y1 + cy);
+    
+    d3.select("#v")
+        .attr("x1", x1 + cx)
+        .attr("y1", y1 + cy)
+        .attr("x2", x1 + cx)
+        .attr("y2", cy);
+      d3.select("#h")
+        .attr("x1", x1 + cx)
+        .attr("y1", y1 + cy)
+        .attr("x2", cx)
+        .attr("y2", y1 + cy);
+
+}
+</script>
+</body>

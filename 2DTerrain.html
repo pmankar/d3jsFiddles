@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<style>
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis line,
+.axis path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+path {
+  stroke: darkgreen;
+  stroke-width: 1;
+  fill: none;
+}
+
+</style>
+</head>
+<body>
+
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+width = 1000;
+height = 400;
+
+svg = d3.select("body").append("svg")
+  .attr("width", width)
+  .attr("height", height)
+  .style("background-color", "white");
+
+var xaxisScale = d3.scale.linear()
+  .domain([0, width])
+  .range([0, width]);
+var yaxisScale = d3.scale.linear()
+  .domain([0, height])
+  .range([0, height]);
+
+var xAxis = d3.svg.axis()
+  .tickSize(height * 0.97)
+  .scale(xaxisScale)
+  .ticks(width / 50);
+var yAxis = d3.svg.axis()
+  .tickSize(width * .98)
+  .scale(yaxisScale)
+  .orient("right")
+  .ticks(height / 50);
+
+var xAxisGroup = svg.append("g")
+  .attr("class", "x axis")
+  .call(xAxis);
+var yAxisGroup = svg.append("g")
+  .attr("class", "y axis")
+  .call(yAxis);
+
+console.clear();
+
+flux = 35;
+reduction = 0.35;
+varience = 4;
+//console.log("x1 " + "\t\t" + "x2 " + "\t\t" + "mp " + "\t\t" + "hl " + "\t\t" + "hr" + "\t\t" + "nh " + "\t\t" + "s  ");
+var valueline = d3.svg.line()
+  .x(function(d) {
+    return (d.x);
+  })
+  .y(function(d) {
+    return (d.y);
+  })
+  .interpolate("cardinal");
+
+r(0, width, height / 3, height / 2, varience);
+drawLines();
+
+function r(x1, x2, hl, hr, s) {
+  tmp = zeroPad(x1, 3);
+  sign = Math.round(Math.random());
+  if (sign == 0) sign = -1;
+  nh = (hl + hr) / 2 + ((Math.ceil(Math.random() * flux * s)) * sign);
+  //console.log(tmp + "\t\t" + Math.round(x2, 0) + "\t\t" + Math.round((x1 + x2) / 2, 0) + "\t\t" + Math.round(hl, 0) + "\t\t" + Math.round(hr, 0) + "\t\t" + Math.round(nh, 0) + "\t\t" + s);
+
+
+  drawCircle(x1, x2, 2, hl, nh);
+  if (x2 - x1 < 40) return;
+  r(x1, (x1 + x2) / 2, hl, nh, s * reduction);
+  r((x1 + x2) / 2, x2, nh, hr, s * reduction);
+
+}
+
+function drawCircle(xl, xr, r, hl, hr) {
+  //console.log(xl + "\t\t" + xr + "\t\t" + hl + "\t\t" + hr);
+  d3.select("svg").append("circle")
+    .attr("cx", (xl + xr) / 2)
+    .attr("cy", hr)
+    .attr("r", r)
+    .attr("fill", "none");
+}
+
+function drawLines() {
+  c = d3.selectAll("circle");
+  c = c[0];
+  obj = c.map(function(d) {
+    return {
+      x: d.cx.animVal.value,
+      y: d.cy.animVal.value
+    }
+  });
+  obj.sort(function(a, b) {
+    return a.x - b.x;
+  });
+
+  d3.select("svg").append("path")
+    .attr("class", "line")
+    .attr("d", valueline(obj));
+
+}
+
+function zeroPad(num, places) {
+  var zero = places - num.toString().length + 1;
+  return Array(+(zero > 0 && zero)).join("0") + num;
+}
+
+d3.select("body").append("input")
+  .attr("type", "button")
+  .attr("value", "update")
+  .attr("id", "btnUpdate")
+  .attr("onclick", "updateData()");
+
+function updateData() {
+  d3.selectAll(".line").transition().remove();
+  d3.selectAll("circle").remove();
+  flux = 35;
+  reduction = 0.35;
+  r(0, width, height / 3, height / 2, varience);
+  drawLines();
+}
+
+</script>
+</body>

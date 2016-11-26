@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<style>
+
+</style>
+</head>
+<body>
+
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+height = 200, width = 200
+svg = d3.select("body").append("svg")
+  .attr("height", height)
+  .attr("width", width);
+
+innerRadius = 30;
+outerRadius = 60;
+noS = 14;
+swAngle = 14;
+
+arc = d3.svg.arc()
+  .outerRadius(outerRadius)
+  .innerRadius(innerRadius)
+  .startAngle(function(d) {
+    return d.sa * (Math.PI / 180)
+  })
+  .endAngle(function(d) {
+    return d.ea * (Math.PI / 180)
+  });
+
+g = svg.append("g")
+  .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+dt = [];
+for (i = 0; i < noS; i++)
+  dt.push({
+    sa: ((i * 360 / noS) + (swAngle / 2)),
+    ea: (((i + 1) * 360 / noS) - (swAngle / 2))
+  })
+
+g.selectAll("path")
+  .data(dt)
+  .enter().append("path")
+  .attr("d", arc)
+  .attr("stroke", "#EEEEEE")
+  .attr("fill", "black")
+  .attr("opacity", 0.0)
+  .attr("id", function(d, i) {
+    return "arc" + i
+  });
+
+curr = 0;
+direction = 1;
+prev = curr;
+speed = 100;
+
+window.setInterval(scroll, speed)
+
+function scroll() {
+  d3.select("#arc" + prev).transition().duration(1000).attr("opacity", 0.0);
+
+  curr = curr + direction;
+
+  if (direction > 0) {
+    if (curr >= noS) curr = 0;
+    sel = curr % noS;
+  }
+  if (direction < 0) {
+    if ((noS + curr) <= -1) curr = -1;
+    sel = noS + curr;
+  }
+  console.log(curr + "\t" + prev);
+  prev = sel;
+  d3.select("#arc" + sel)
+    .attr("opacity", 1);
+}
+
+/*g.append("path")
+    .data([{sa:  - (swAngle / 2), ea: 360 - ((360 / noS) - (swAngle / 2))}])
+    .attr("d", arc)
+    .attr("stroke", "grey")
+    .attr("fill", "grey")
+    .attr("opacity", 0.1)
+    .append("animateTransform")
+        .attr("attributeName", "transform")
+        .attr("type", "rotate")
+        .attr("values", "0;360")
+        .attr("dur", "2s")
+        .attr("repeatCount", "indefinite");*/
+
+</script>
+</body>

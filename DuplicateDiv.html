@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<style>
+
+</style>
+</head>
+<body>
+<div id="duplicater0"> 
+    duplicate EVERYTHING INSIDE THIS DIV
+</div>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+document.getElementById('duplicater0').onclick = duplicate;
+document.getElementById('duplicater0').oncontextmenu  = remove;
+
+
+var i = 0;
+
+function duplicate() {
+    var original = document.getElementById('duplicater' + i);
+    i++;
+    var clone = original.cloneNode(true); // "deep" clone
+    clone.id = "duplicater" + (i).toString(); // there can only be one element with an ID
+    clone.onclick = duplicate; // event handlers can also be cloned
+    original.parentNode.appendChild(clone);
+}
+
+function remove(e) {
+    var latest = document.getElementById('duplicater' + i);
+    if(i > 0)
+    {
+        latest.remove();
+         i--;   
+    }
+    else 
+        alert("last element, can't remove");
+    
+    return false; // to avoid presenting context menu
+}
+</script>
+</body>

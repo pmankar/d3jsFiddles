@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<style>
+
+</style>
+</head>
+<body>
+
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+var height = 400,
+  width = 400
+var c = 2 * Math.PI;
+var ctr = 0;
+
+var svg = d3.select("body").append("svg")
+  .attr("width", width)
+  .attr("height", height)
+  .style("background-color", "#EFEFEF")
+  .append("g")
+  .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+var arc = d3.svg.arc()
+  .innerRadius(120)
+  .outerRadius(140);
+
+var bg = svg.append("path")
+  .datum({
+    endAngle: 0.0 * c,
+    startAngle: 1.0 * c
+  })
+  .style("fill", "#E6E6E6")
+  .attr("d", arc);
+
+var fg = svg.append("path")
+  .datum({
+    endAngle: 0.0 * c,
+    startAngle: 0.0 * c
+  })
+  .style("fill", "grey")
+  .attr("d", arc);
+
+setInterval(function() {
+  fg.datum({
+      endAngle: 0.0 * c,
+      startAngle: 0.0 * c
+    })
+    .transition()
+    .duration(2950)
+    .ease("ease-in-out")
+    .call(arcTween, c);
+}, 3000);
+
+function arcTween(transition, newAngle) {
+  transition.attrTween("d", function(d) {
+    var ei = d3.interpolate(d.endAngle, c * 2);
+    var si = d3.interpolate(d.startAngle, c * 1);
+    return function(t) {
+      d.endAngle = ei(t);
+      d.startAngle = si(t);
+      return arc(d);
+    };
+  });
+}
+
+</script>
+</body>

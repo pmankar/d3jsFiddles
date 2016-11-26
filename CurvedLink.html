@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<style>
+.link {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+</style>
+</head>
+<body>
+
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+var height = 800,
+  width = 800,
+  radius = 10;
+var links = [];
+
+var svg = d3.select("body").append("svg")
+  .attr("height", height)
+  .attr("width", width);
+
+var drag = d3.behavior.drag()
+  .on("drag", dragmove)
+  .on("dragend", dragend);
+
+var diagonal = d3.svg.diagonal()
+  // swap order of x & y for top to bottom tree
+  .projection(function(d) {
+    return [d.y, d.x];
+  });
+
+svg.append("circle")
+  .attr("cx", 40)
+  .attr("cy", 300)
+  .attr("r", radius)
+  .attr("id", "src")
+  .call(drag);
+
+svg.append("circle")
+  .attr("cx", 140)
+  .attr("cy", 100)
+  .attr("r", radius)
+  .attr("id", "dst")
+  .call(drag);
+
+updateLinks();
+
+function updateLinks() {
+  var csel = d3.selectAll("circle")
+    // use same order of x & y for top to bottom tree
+  links[0] = {
+    source: {
+      x: +d3.select(csel[0][0]).attr("cy"),
+      y: +d3.select(csel[0][0]).attr("cx")
+    },
+    target: {
+      x: +d3.select(csel[0][1]).attr("cy"),
+      y: +d3.select(csel[0][1]).attr("cx")
+    }
+  }
+
+  svg.selectAll(".link").remove();
+
+  var link = svg.selectAll(".link")
+    .data(links)
+    .enter().append("path")
+    .attr("class", "link")
+    .transition()
+    .attr("d", diagonal);
+}
+
+function dragmove(d) {
+  d3.select(this)
+    .attr("cx", d3.event.x)
+    .attr("cy", d3.event.y);
+  updateLinks();
+}
+
+function dragend(d) {
+
+}
+
+</script>
+</body>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<style>
+
+</style>
+</head>
+<body>
+
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+var myVar = setInterval(function () {
+    ud()
+}, 1000);
+
+height = 300, width = 300;
+sr = height / 2.1;
+tr = (-1) * height / 15;
+mr = height / 2.9;
+hr = height / 4;
+d = new Date();
+
+svg = d3.select("body").append("svg")
+    .attr("height", height)
+    .attr("width", width);
+plotTicks();
+svg.append("circle")
+    .attr("cx", height / 2)
+    .attr("cy", width / 2)
+    .attr("r", 3)
+    .attr("fill", "grey");
+circ = svg.append("circle")
+    .attr("cx", height / 2)
+    .attr("cy", width / 2)
+    .attr("r", height / 2.05)
+    .attr("stroke-width", 2)
+    .attr("stroke", "black")
+    .attr("fill", "none");
+
+sl = svg.append("line")
+    .attr("x1", height / 2)
+    .attr("y1", height / 2)
+    .attr("stroke", "grey")
+    .attr("stroke-width", 1);
+tl = svg.append("line")
+    .attr("x1", height / 2)
+    .attr("y1", height / 2)
+    .attr("stroke", "grey")
+    .attr("stroke-width", 1);
+ml = svg.append("line")
+    .attr("x1", height / 2)
+    .attr("y1", height / 2)
+    .attr("stroke", "grey")
+    .attr("stroke-width", 3);
+hl = svg.append("line")
+    .attr("x1", height / 2)
+    .attr("y1", height / 2)
+    .attr("stroke", "grey")
+    .attr("stroke-width", 5);
+
+function plotTicks() {
+    for (i = 0; i < 60; i++) {
+        x1 = (Math.cos(Math.PI / 180 * (i - 15) * 6) * height / 2.04) + height / 2;
+        y1 = (Math.sin(Math.PI / 180 * (i - 15) * 6) * height / 2.04) + height / 2;
+        x2 = (Math.cos(Math.PI / 180 * (i - 15) * 6) * height / 2.2) + height / 2;
+        y2 = (Math.sin(Math.PI / 180 * (i - 15) * 6) * height / 2.2) + height / 2;
+        svg.append("line")
+            .attr("x1", x1)
+            .attr("y1", y1)
+            .attr("x2", x2)
+            .attr("y2", y2)
+            .attr("stroke", function () {
+            if (i % 5 == 0) return "black";
+            else return "grey";
+        })
+            .attr("stroke-width", function () {
+            if (i % 5 == 0) return 2.5;
+            else return 1;
+        });
+    }
+}
+
+function ud() {
+    d = new Date();
+
+    sx = (Math.cos(Math.PI / 180 * (d.getSeconds() - 15) * 6) * sr) + height / 2;
+    sy = (Math.sin(Math.PI / 180 * (d.getSeconds() - 15) * 6) * sr) + height / 2;
+    sl.transition()
+        .duration(900)
+        .ease("linear")
+        .attr("x2", sx)
+        .attr("y2", sy);
+
+    tx = (Math.cos(Math.PI / 180 * (d.getSeconds() - 15) * 6) * tr) + height / 2;
+    ty = (Math.sin(Math.PI / 180 * (d.getSeconds() - 15) * 6) * tr) + height / 2;
+    tl.transition()
+        .duration(900)
+        .ease("linear")
+        .attr("x2", tx)
+        .attr("y2", ty);
+
+    mx = (Math.cos(Math.PI / 180 * (d.getMinutes() - 15) * 6) * mr) + height / 2;
+    my = (Math.sin(Math.PI / 180 * (d.getMinutes() - 15) * 6) * mr) + height / 2;
+    ml.transition()
+        .duration(800)
+        .ease("linear")
+        .attr("x2", mx)
+        .attr("y2", my);
+
+    hx = (Math.cos(Math.PI / 180 * (d.getHours() + (d.getMinutes() / 60) - 3) * 30) * hr) + height / 2;
+    hy = (Math.sin(Math.PI / 180 * (d.getHours() + (d.getMinutes() / 60) - 3) * 30) * hr) + height / 2;
+    hl.transition()
+        .duration(800)
+        .ease("linear")
+        .attr("x2", hx)
+        .attr("y2", hy);
+}
+</script>
+</body>

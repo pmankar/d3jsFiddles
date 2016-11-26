@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<style>
+
+</style>
+</head>
+<body>
+
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+svg = d3.select("body").append("svg")
+    .attr("width", 1500)
+    .attr("height", 500);
+
+var circ = [2440  ,6052  ,6378  ,3397  ,71492  ,60268  ,25559  ,24766  ,1150  ];
+
+g = svg.append("g").attr('transform', 'translate(30, 30)');
+xd = 0;
+for(i = 0; i < circ.length; i++)
+{ 
+    scale = 400;
+    circ[i] = circ[i] / scale;
+    g.append("circle")
+        .attr("cx",xd + circ[i])
+        .attr("cy",200)
+        .attr("r",circ[i])
+        .attr("fill", "green");
+    xd = (2 * circ[i]) + xd;
+}
+
+</script>
+</body>

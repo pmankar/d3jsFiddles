@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<style>
+path {
+  fill: none;
+  stroke: #000;
+  stroke-width: 3px;
+}
+
+circle {
+  stroke: #fff;
+  stroke-width: 3px;
+}
+
+</style>
+</head>
+<body>
+
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+var svg = d3.select("body").append("svg")
+  .attr("width", 960)
+  .attr("height", 500);
+
+var path = svg.append("path")
+  .attr("d", "M280,250a200,200 0 1,0 400,0a200,200 0 1,0 -400,0");
+
+
+var circle = svg.append("circle")
+  .attr("r", 8)
+  .attr("fill", "steelblue");
+
+transition();
+
+function transition() {
+  circle.transition()
+    .duration(10000)
+    .ease("smooth")
+    .attrTween("transform", translateAlong(path.node()))
+    .each("end", transition);
+}
+
+// Returns an attrTween for translating along the specified path element.
+function translateAlong(path) {
+  var l = path.getTotalLength();
+  return function(d, i, a) {
+    return function(t) {
+      var p = path.getPointAtLength(t * l);
+      return "translate(" + p.x + "," + p.y + ")";
+    };
+  };
+}
+
+
+var circle2 = svg.append("circle")
+  .attr("r", 8)
+  .attr("fill", "red");
+
+transition2();
+
+function transition2() {
+  circle2.transition()
+    .duration(4000)
+    .ease("smooth")
+    .attrTween("transform", translateAlong2(path.node()))
+    .each("end", transition2);
+}
+
+// Returns an attrTween for translating along the specified path element.
+function translateAlong2(path) {
+  var l = path.getTotalLength();
+  return function(d, i, a) {
+    return function(t) {
+      var p = path.getPointAtLength(t * l);
+      return "translate(" + p.x + "," + p.y + ")";
+    };
+  };
+}
+
+</script>
+</body>
