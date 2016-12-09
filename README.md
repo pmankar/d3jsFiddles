@@ -9,7 +9,7 @@ Sample applications with d3js
 * **CircularSpinner.html** : A spinner in d3js
 * **ColorMix.html** : RGB color mixture to show how the order of mixing colors infulences the final results.
 * **CurvedLink.html** : Two draggable points connected by a curved link
-* **d3.slider.js** : JS library for d3js slider
+* **d3.slider.js** : JS library for d3js slider that was used at the time of development
 * **d3.v3.min.js** : JS library for d3js that was used at the time of development
 * **DuplicateDiv.html** : Copy the contents of one div using pure HTML and JS
 * **EarthMoonTrueScale.html** : Showing Earth and Moon to true scale, and showing the infulence of gravity of Earth
@@ -27,8 +27,11 @@ Sample applications with d3js
 * **Spirograph.html** : A simple Spirograph created using d3js
 * **SVGLoader.html** : SVG loader similar to stackoverflow created using d3js
 * **SVGvsCanvas.html** : Image comparision with SVG and Canvas using PNG as base
+* **ThreejsCam.html** : Three.js smooth camera movement using tween
+* **three.min.js** : JS library for three.js that was used at the time of development
 * **TrignometricCircle.html** : Trignometric circle showing the angle and point of intersection with the circle
-* **zdjquery.js** : jQuery library for send keys application
+* **Tween.js** : Tween library that was used at the time of development
+* **zdjquery.js** : jQuery library for send keys application that was used at the time of development
 
 ## Working Links
 * **2DTerrain.html** : https://jsfiddle.net/pmankar/q49amq6f/
@@ -52,4 +55,5 @@ Sample applications with d3js
 * **Spirograph.html** : https://jsfiddle.net/pmankar/37mujbxn/
 * **SVGLoader.html** : https://jsfiddle.net/pmankar/9j982p11/
 * **SVGvsCanvas.html** : https://jsfiddle.net/pmankar/rvh4eyas/
+* **ThreejsCam.html** : https://jsfiddle.net/pmankar/ck5vojmn/
 * **TrignometricCircle.html** : https://jsfiddle.net/pmankar/jncoc7vg/
