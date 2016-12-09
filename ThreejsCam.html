@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js camera movement</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+		  overflow: hidden;
+		}
+	</style>
+</head>
+<body>
+	<input type ="checkbox" id="smooth"/> Smooth Cam [avoid going inside mesh]
+	<div id="threeDOM"></div>
+	<script src="three.min.js"></script>
+	<script src="Tween.js"></script>
+	<script>
+		var camera, scene, renderer;
+		var geometry, material, point_sphere_iso_geom;
+		var iradius = 100;
+		var mouse = new THREE.Vector2();
+		var tween, camPos, dstPos;
+		init();
+		animate();
+
+		function init() {
+		  group = new THREE.Object3D();
+		  camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 10000);
+		  camera.position.z = iradius * 3;
+		  scene = new THREE.Scene();
+		  scene.fog = new THREE.FogExp2(0x18222F, 0.0029);
+		  material = new THREE.MeshBasicMaterial({
+			color: 0xff0000,
+			wireframe: true
+		  });
+		  
+			// add Icosahedron
+		  point_sphere_iso_geom = new THREE.IcosahedronGeometry(iradius, 4);
+		  mesh = new THREE.Mesh(point_sphere_iso_geom, material);
+		  scene.add(mesh);
+
+		  spgeo = new THREE.SphereGeometry(5, 10, 10);
+		  sphere = new THREE.Mesh(spgeo, material);
+		  sphere.position.z = iradius * 1.2;
+		  mesh.add(sphere);
+		  //THREE.GeometryUtils.merge(point_sphere_iso_geom, sphere);
+
+		  renderer = new THREE.WebGLRenderer();
+		  renderer.setSize(window.innerWidth, window.innerHeight);
+		  document.getElementById("threeDOM").appendChild(renderer.domElement);
+		  
+		  camPos = new THREE.Vector3(0, 0, iradius * 3);
+		  //dstPos = new THREE.Vector3(0, 0, 120);
+		  
+		}
+
+		function animate(time) {
+		  requestAnimationFrame(animate);
+		  TWEEN.update(time);
+		  //mesh.rotation.y += 0.005;
+		  //camera.position.z = 300 - 150 * Math.sin(time * 0.0001);
+		  camera.lookAt(new THREE.Vector3(0,0,0));
+		  renderer.render(scene, camera);
+		}
+
+		// tween update
+		function update(){
+			var tmp = document.getElementById("smooth").checked ? polarProjection(camPos.x, camPos.y, camPos.z, iradius * 3) :  [camPos.x, camPos.y, camPos.z];
+			camera.position.x = tmp[0];
+		  camera.position.y = tmp[1];
+		  camera.position.z = tmp[2];
+		}
+
+		// bind click event
+		document.getElementById("threeDOM").addEventListener('mousedown', onMouseDown, false);
+		c = camera;
+		function onMouseDown(e) {
+		  e.preventDefault();
+		  addYellowPoint(e.clientX, e.clientY);
+		}
+
+		// calculate polar projections
+		function polarProjection(x, y, z, R){
+		  r = Math.sqrt((x*x) + (y*y) + (z*z));
+		  theta = Math.acos( z/r);
+		  phi = Math.atan2( y,x )
+		  x = R * Math.sin(theta) * Math.cos(phi);
+		  y = R * Math.sin(theta) * Math.sin(phi);
+		  z = R * Math.cos(theta);
+		  return [x, y, z];
+		}
+
+		// add yellow cube
+		function addYellowPoint(valX, valY) {
+		  var geometry = new THREE.BoxGeometry(5, 5, 5);
+		  var material = new THREE.MeshBasicMaterial({
+			color: 0xffff00,
+			wireframe: true
+		  });
+		  var cube = new THREE.Mesh(geometry, material);
+		  // select and set cube on Ico geom's random vertex
+			var randsel = Math.round(Math.random() * point_sphere_iso_geom.vertices.length);
+		  var x = point_sphere_iso_geom.vertices[randsel].x;
+		  var y = point_sphere_iso_geom.vertices[randsel].y;
+		  var z = point_sphere_iso_geom.vertices[randsel].z;
+		  cube.position.set(x, y, z);
+		  mesh.add(cube);
+		  
+		  // polar and update to set dstPos:
+		  var tmp = polarProjection(x, y, z, iradius * 3);
+		  dstPos = new THREE.Vector3(tmp[0], tmp[1], tmp[2]);
+		  // tween config
+		  tween = new TWEEN.Tween(camPos)
+			.to({x: dstPos.x, y: dstPos.y, z: dstPos.z}, 2000)
+			.delay(100)
+			.easing(TWEEN.Easing.Cubic.InOut)
+			.onUpdate(update);
+		  tween.start();
+		}
+	</script>
+</body>
+</html>
